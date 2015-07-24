@@ -15,6 +15,11 @@ With
     <outputFile> = The corresponding RML mapping document
     <mappingLanguage> = The original mapping language (currentl D2RQL,CSVW)
 
+
+Requirements
+------------
+ANYtoRML requires the [rdflib-jsonld](https://github.com/RDFLib/rdflib-jsonld) plugin.
+
 More Information
 ----------------
 
