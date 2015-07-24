@@ -30,7 +30,7 @@ def main(argv):
    if(mappingLanguage == 'CSVW'):
       CSVWtoRML.CSVWtoRML(inputfile)
 
-   RMLgenerator.resultsGenerator(outputfile)
+   RMLgenerator.resultsGeneration(outputfile)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
