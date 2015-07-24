@@ -1,7 +1,7 @@
-D2RQ_to_R2RML
+ANYtoRML
 =============
 
-Python script that converts D2RQ mapping documents to R2RML mapping documents
+Python script that converts mapping documents in different mapping languages to RML mapping documents
 
 Usage
 -----
