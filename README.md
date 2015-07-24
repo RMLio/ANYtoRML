@@ -11,8 +11,8 @@ You can run a conversion by executing the following command:
 
 With 
     
-    <inputFile>  = The original mapping document 
-    <outputFile> = The corresponding RML mapping document
+    <inputFile>       = The original mapping document 
+    <outputFile>      = The corresponding RML mapping document
     <mappingLanguage> = The original mapping language (currentl D2RQL,CSVW)
 
 
