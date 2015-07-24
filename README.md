@@ -32,4 +32,4 @@ Copyright 2015, Multimedia Lab - Ghent University - iMinds
 License
 -------
 
-The RMLProcessor is released under the terms of the [MIT license](http://opensource.org/licenses/mit-license.html).
+ANYtoRML is released under the terms of the [MIT license](http://opensource.org/licenses/mit-license.html).
