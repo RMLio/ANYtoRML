@@ -1,5 +1,5 @@
 import sys,getopt,logging
-import RMLgenerator, CSVWtoRML
+import RMLgenerator, CSVWtoRML, R2RMLtoRML
 
 logging.basicConfig(filename='ANYtoRML.log',level=logging.DEBUG)
 
@@ -11,14 +11,14 @@ def main(argv):
    try:
       opts, args = getopt.getopt(argv,"hi:o:l:",["ifile=","ofile=","mlanguage"])
    except getopt.GetoptError:
-      print 'python ANYtoRML.py -i <CSVW_mapDoc> -o <RML_mapDoc> -l <mappingLanguage>'
+      print 'python ANYtoRML.py -i <ANY_mapDoc> -o <RML_mapDoc> -l <mappingLanguage>'
       sys.exit(2)
    for opt, arg in opts:
       if opt == '-h':
          print '\npython ANYtoRML.py -i <original_mapDoc> -o <RML_mapDoc> -l <mappingLanguage> \n'
-         print '<original_mapDoc> Path to the original mapping document'
+         print '<ANY_mapDoc>      Path to the original mapping document'
          print '<RML_mapDoc>      Path to the RML mapping document'
-         print '<mappingLanguage> The mapping language used for the original mapping document (CSVW, D2RQL) \n'
+         print '<mappingLanguage> The mapping language used for the original mapping document (CSVW, R2RML, D2RQL) \n'
          sys.exit()
       elif opt in ("-i", "--ifile"):
          inputfile = arg
@@ -29,10 +29,13 @@ def main(argv):
 
    if(mappingLanguage == 'CSVW'):
       CSVWtoRML.CSVWtoRML(inputfile)
+      RMLgenerator.resultsGeneration(outputfile)
    elif(mappingLanguage == 'R2RML'):
       R2RMLtoRML.R2RMLtoRML(inputfile)
+      R2RMLtoRML.resultsGeneration(outputfile)
+      
 
-   RMLgenerator.resultsGeneration(outputfile)
+   
 
 if __name__ == "__main__":
     main(sys.argv[1:])

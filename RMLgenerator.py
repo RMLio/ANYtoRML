@@ -152,5 +152,6 @@ def JoinConditionGeneration(objNode):
 def resultsGeneration(outputfile):
    print("RML graph has %s statements." % len(newg))
    now = datetime.datetime.now()
-   newg.add( (BNode(), URIRef("http://purl.org/dc/elements/1.1/created"), Literal(time.strftime(str(now.year)+"-"+str(now.month)+"-"+str(now.day))) ) ) 
+   newg.add( (BNode(), URIRef("http://purl.org/dc/elements/1.1/created"), 
+      Literal(time.strftime(str(now.year)+"-"+str(now.month)+"-"+str(now.day))) ) ) 
    newg.serialize(outputfile,format='turtle')
