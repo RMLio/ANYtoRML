@@ -30,10 +30,19 @@ def R2RMLtoRML(inputfile):
 	for subject,predicate,object in g.triples( (None, URIRef(R2RML.logicalTable), None) ):
 		g.remove((subject,predicate,object))
 		g.add((subject,RML.logicalSource,object))
-		g.add((object,RML.referenceFormulation,R2RML.SQL2008))
+		if (None, R2RML.sqlVersion, None) in g:
+			for subj,pred,version in g.triples( (None, URIRef(R2RML.sqlVersion), None) ):
+				g.remove((subj,pred,version))
+				g.add((object,RML.referenceFormulation,version))
+		else:
+			g.add((object,RML.referenceFormulation,R2RML.SQL2008))
 		source = BNode()
 		databaseAccessibility(source)
 		g.add((object,RML.source,source))
+
+	for subject,predicate,object in g.triples( (None, URIRef(R2RML.sqlQuery), None) ):
+		g.remove((subject,predicate,object))
+		g.add((subject,RML.query,object))
 
 	for subject,predicate,object in g.triples( (None, URIRef(R2RML.column), None) ):
 		g.remove((subject,predicate,object))
