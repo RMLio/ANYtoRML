@@ -44,8 +44,16 @@ def LogicalSourceGeneration(logicalSource,source):
    global logicalSourceNode
    logicalSourceNode = logicalSource
    if(source):
-      newg.add([logicalSourceNode, RML.source,source])
+      newg.add([logicalSourceNode, RML.source, source])
    newg.add([logicalSourceNode, RDF.type, RML.LogicalSource])
+
+
+# Reference Formulation Generation
+
+def ReferenceFormulationGeneration(logicalSource,source):
+   global logicalSourceNode
+   logicalSourceNode = logicalSource
+   newg.add([URIRef(logicalSourceNode), RML.referenceFormulation, URIRef('http://semweb.mmlab.be/ns/ql#CSV')])
 
 
 # Subject Map Generation
@@ -67,7 +75,7 @@ def SubjectMapTemplateGeneration(resource,pattern):
    global subjectNode
 
    if(pattern != "null"):
-      newg.add([subjectNode, R2RML.template,Literal(pattern)])
+      newg.add([resource, R2RML.template,Literal(pattern)])
 
 
 # Predicate Object Map Generation

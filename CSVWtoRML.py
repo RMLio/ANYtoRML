@@ -8,7 +8,8 @@ from rdflib.serializer import Serializer
 
 logging.basicConfig(filename='CSVWtoRML.log',level=logging.DEBUG)
 
-CSVW= Namespace("http://www.w3.org/ns/csvw#")
+CSVW = Namespace("http://www.w3.org/ns/csvw#")
+QL   = Namespace("http://semweb.mmlab.be/ns/ql#")
 
 g=rdflib.Graph()
 
@@ -16,15 +17,22 @@ def CSVWtoRML(inputfile):
    g.parse(inputfile, format='json-ld')
    print("CSVW graph has %s statements." % len(g))
 
-   #extract the table's URL
+   #Extract the table's URL
    sources = g.objects(None, URIRef(CSVW.url))
    if sources:
+      #TODO: Replace the following with CSVW Source description   
       source = URIRef(sources.next())
       #source = URIRef(sources.next())
 
    #extract table URL to generate the Logical Source
    logSource = BNode().skolemize()
+   #Generate the Logical Source
    RMLgenerator.LogicalSourceGeneration(logSource,source)
+
+   #Generate Reference Formulation
+   ReferenceFormulationValue = URIRef(QL.CSV)
+   RMLgenerator.ReferenceFormulationGeneration(logSource, ReferenceFormulationValue)
+
    tmValues = g.query(
       """SELECT DISTINCT ?aboutUrl
       WHERE {
@@ -32,27 +40,31 @@ def CSVWtoRML(inputfile):
       }""")
 
    for tmValue in tmValues:
-      print "tmValue " + str(tmValue)
+
+      print "Generating Triples Maps..."
       strTmValue = str(tmValue.aboutUrl)
-      print "strTmValue " + str(strTmValue)
       #extract about URL to generate Triples Map URI
-      uriTmValue = URIRef(strTmValue.replace('-{_row}',''))
-      print "uriTmValue " + str(uriTmValue)
+      uriTmValue = URIRef(strTmValue.replace('{','').replace('}',''))
       RMLgenerator.TriplesMapGeneration(uriTmValue,logSource)
 
+      print "Generating Subject Maps..."
       #generate Blank node for Subject Map
       subjMapBN = BNode().skolemize()
+      #Generate Subject Map
       RMLgenerator.SubjectMapGeneration(uriTmValue,subjMapBN)
-      RMLgenerator.SubjectMapTemplateGeneration(subjMapBN,"null")
+      #Subject Map template generated according to csvw:aboutURL
+      RMLgenerator.SubjectMapTemplateGeneration(subjMapBN,strTmValue)
 
       #Extract columns to turn them into Predicate Object Maps
       for preObj,predicate,object in g.triples( (None, URIRef(CSVW.column), None) ):
+         print "Generating Predicate Object Maps..."
          preObj = BNode().skolemize()
          RMLgenerator.PredicateObjectMapGeneration(uriTmValue,preObj)
 
          #TODO: Change RDF.first to iterate over the available predicates
          #Extract each column
          column = g.value(subject = object, predicate = RDF.first)
+         print "column " + str(column)
 
          #Extract the property URL to generate the Predicate Map
          predicateValues = g.objects(column,URIRef(CSVW.propertyUrl))
