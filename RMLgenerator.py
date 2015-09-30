@@ -43,7 +43,8 @@ def LogicalTableGeneration(subject):
 def LogicalSourceGeneration(logicalSource,source):
    global logicalSourceNode
    logicalSourceNode = logicalSource
-   newg.add([logicalSourceNode, RML.source,source])
+   if(source):
+      newg.add([logicalSourceNode, RML.source,source])
    newg.add([logicalSourceNode, RDF.type, RML.LogicalSource])
 
 
@@ -105,7 +106,7 @@ def ObjectMapGeneration(oValue,preObj,termType):
 
 def DatatypeGeneration(datatype,objMap):
    print 'objMap ' + objMap
-   newg.add([objMap.skolemize(), R2RML.datatype, XSD[datatype]])
+   newg.add([objMap, R2RML.datatype, XSD[datatype]])
    #TODO: Add exceptions
 
 
