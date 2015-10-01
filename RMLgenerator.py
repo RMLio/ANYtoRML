@@ -121,8 +121,8 @@ def ObjectMapGeneration(oValue,preObj,termType):
 # Datatype Generation
 
 def DatatypeGeneration(datatype,objMap):
-   print 'objMap ' + objMap
-   newg.add([objMap, R2RML.datatype, XSD[datatype]])
+   #newg.add([objMap, R2RML.datatype, XSD[datatype]])
+   newg.add([objMap, R2RML.datatype, URIRef(datatype)])
    #TODO: Add exceptions
 
 
