@@ -41,7 +41,7 @@ def LogicalTableGeneration(subject):
 # Logical Source Generation
 
 def LogicalSourceGeneration(logicalSource,source):
-   global logicalSourceNode
+   #global logicalSourceNode
    logicalSourceNode = logicalSource
    if(source):
       newg.add([logicalSourceNode, RML.source, source])
@@ -51,7 +51,7 @@ def LogicalSourceGeneration(logicalSource,source):
 # Reference Formulation Generation
 
 def ReferenceFormulationGeneration(logicalSource,source):
-   global logicalSourceNode
+   #global logicalSourceNode
    logicalSourceNode = logicalSource
    newg.add([URIRef(logicalSourceNode), RML.referenceFormulation, URIRef('http://semweb.mmlab.be/ns/ql#CSV')])
 
@@ -63,6 +63,14 @@ def SubjectMapGeneration(tm,subject):
    newg.add([subject, RDF.type, R2RML.SubjectMap])
 
 
+# Blank Node Subject Generation
+
+def BlankNodeSubjectMapGeneration(tm,subject):
+   newg.add([tm, R2RML.subjectMap,subject])
+   newg.add([subject, RDF.type, R2RML.SubjectMap])
+   newg.add([subject, R2RML.termType, R2RML.BlankNode])
+
+
 # Logical Source Class Generation
 
 def ClassGeneration(subject,classValue):
@@ -71,7 +79,7 @@ def ClassGeneration(subject,classValue):
 
 # Subject Map Template Generation
 
-def SubjectMapTemplateGeneration(resource,pattern):
+def TemplateGeneration(resource,pattern):
    global subjectNode
 
    if(pattern != "null"):

@@ -1,7 +1,8 @@
 import sys,getopt,logging
-import RMLgenerator, CSVWtoRML, R2RMLtoRML
+from CSVWtoRML.CSVWtoRML import CSVWtoRML
+import RMLgenerator, R2RMLtoRML
 
-logging.basicConfig(filename='ANYtoRML.log',level=logging.DEBUG)
+logging.basicConfig(filename='log/ANYtoRML.log',level=logging.DEBUG)
 
 inputfile = ''
 outputfile = ''
@@ -28,7 +29,7 @@ def main(argv):
          mappingLanguage = arg
 
    if(mappingLanguage == 'CSVW'):
-      CSVWtoRML.CSVWtoRML(inputfile)
+      CSVWtoRML(inputfile)
       RMLgenerator.resultsGeneration(outputfile)
    elif(mappingLanguage == 'R2RML'):
       R2RMLtoRML.R2RMLtoRML(inputfile)
