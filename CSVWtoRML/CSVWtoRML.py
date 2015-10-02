@@ -58,20 +58,16 @@ def CSVWtoRML(inputfile):
 
          print "Generating Predicate Object Maps..."
          columns = g.value(subject = tableValue.tableSchema, predicate = URIRef(CSVW.column))
-         #nextFirst = g.value(subject = columns, predicate = RDF.rest)
-         nextFirst = g.value(subject = columns, predicate = RDF.first)
-         for triple in g.triples((nextFirst,None,None)):
-            print "triple " + str(triple)
-
          nextFirst = columns
+         
          while nextFirst:
             column = None
+            preObj = None
             node = g.value(subject = nextFirst, predicate = RDF.first)
             column = g.value(subject = node, predicate = CSVW.propertyUrl)
             
             if not column:
                column = g.value(subject = node, predicate = CSVW.name)
-               print "column " + str(column)
                if column:
                   column = source + "#" + column
                   
@@ -80,31 +76,42 @@ def CSVWtoRML(inputfile):
                RMLgenerator.PredicateObjectMapGeneration(tmNode,preObj)
                RMLgenerator.PredicateMapGeneration(column,preObj)
 
-            #Extract the title that points to the corresponding column to generate the Object Map
-            objectValues = g.objects(node,URIRef(CSVW.title))
-            for objectValue in objectValues:
-               objMap = RMLgenerator.ObjectMapGeneration(Literal(objectValue),preObj,'reference')
-               if (node, CSVW.datatype, None ) in g:
-                  datatype = g.value(node, URIRef(CSVW.datatype))
-                  datatypeValue = g.value(datatype, CSVW.base)
-                  RMLgenerator.DatatypeGeneration(datatypeValue,objMap)
-
-               
-            if (node, URIRef(CSVW.valueUrl), None) not in g:
-               objectValues = g.objects(node,URIRef(CSVW.name))
+               #Extract the title that points to the corresponding column to generate the Object Map
+               objectValues = g.objects(node,URIRef(CSVW.title))
                for objectValue in objectValues:
-                  objectValueBN = BNode().skolemize()
+                  print "object value " + str(objectValue)
+
                   objMap = RMLgenerator.ObjectMapGeneration(Literal(objectValue),preObj,'reference-valued')
                   if (node, CSVW.datatype, None ) in g:
                      datatype = g.value(node, URIRef(CSVW.datatype))
-                     RMLgenerator.DatatypeGeneration(datatype,objMap)
-            #else:
-            #   objectValues = g.objects(node,URIRef(CSVW.valueUrl))
-            #   for objectValue in objectValues:
-            #      objectValueBN = BNode().skolemize()
-            #      objMap = RMLgenerator.ObjectMapGeneration(Literal(objectValue),preObj,'template-valued')
+                     datatypeValue = g.value(datatype, CSVW.base)
+                     if datatypeValue:
+                        datatype = URIRef("http://www.w3.org/2001/XMLSchema#" + datatypeValue)
+                     print "datatype " + str(datatype)
+                     if(datatype):
+                        RMLgenerator.DatatypeGeneration(datatype,objMap)
+
+                  
+               if ((node, URIRef(CSVW.title), None) not in g) and ((node, URIRef(CSVW.valueUrl), None) not in g):
+                  print "here?"
+                  objectValues = g.objects(node,URIRef(CSVW.name))
+                  for objectValue in objectValues:
+                     objectValueBN = BNode().skolemize()
+                     objectivo = Literal(objectValue)
+                     print "preObj " + preObj
+                     objMap = RMLgenerator.ObjectMapGeneration(objectivo,preObj,'reference-valued')
+                     if objMap and (node, CSVW.datatype, None ) in g:
+                        datatype = g.value(node, URIRef(CSVW.datatype))
+                        if(datatype):
+                           RMLgenerator.DatatypeGeneration(datatype,objMap)
+               elif (node, URIRef(CSVW.valueUrl), None) in g:
+                  objectValues = g.objects(node,URIRef(CSVW.valueUrl))
+                  for objectValue in objectValues:
+                     objectValueBN = BNode().skolemize()
+                     objMap = RMLgenerator.ObjectMapGeneration(Literal(objectValue),preObj,'template-valued')
 
             nextFirst = g.value(subject = nextFirst, predicate = RDF.rest)
+            print "next..."
             
 
 
