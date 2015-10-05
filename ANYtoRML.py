@@ -29,6 +29,7 @@ def main(argv):
          mappingLanguage = arg
 
    if(mappingLanguage == 'CSVW'):
+      print "CSVWtoRML"
       CSVWtoRML(inputfile)
       RMLgenerator.resultsGeneration(outputfile)
    elif(mappingLanguage == 'R2RML'):
