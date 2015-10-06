@@ -6,9 +6,6 @@ from rdflib import Graph, Namespace, URIRef, BNode, RDF, Literal, plugin
 from rdflib.namespace import RDF, XSD
 from rdflib.serializer import Serializer
 
-logging.basicConfig(filename='/media/andimou/723A1FC53A1F856F/Ubuntu_Documents/MappingDocs/ANYtoRML/log/CSVWtoRML.log', filemode='w', level=logging.DEBUG)
-#logging.setLevel(logging.INFO)
-
 CSVW = Namespace("http://www.w3.org/ns/csvw#")
 QL   = Namespace("http://semweb.mmlab.be/ns/ql#")
 
@@ -46,7 +43,7 @@ def logicalSourceGeneration(source):
 
 def retrieveColumn(source,node):
    column = None
-   #column = g.value(subject = node, predicate = CSVW.propertyUrl)
+   column = g.value(subject = node, predicate = CSVW.propertyUrl)
 
    if not column:
       column = g.value(subject = node, predicate = CSVW.name)
@@ -68,11 +65,6 @@ def datatypeGeneration(node, objMap):
 
 
 def CSVWtoRML(inputfile):
-   logging.info('INFO')
-   logging.debug('DEBUG')
-   logging.error('ERROR')
-
-   logging.debug("CSVWtoRML has started.")
    g.parse(inputfile, format='json-ld')
    print("CSVW graph has %s statements." % len(g))
 
@@ -89,30 +81,41 @@ def CSVWtoRML(inputfile):
       #Triples Map node
       tmNode = URIRef(tmValue)
 
-      print "Retrieving individual table..."
-      #source = locateTable(tableValue)
-
       #Extract the table's URL
       sources = g.objects(tableValue.table, URIRef(CSVW.url))
 
       for source in sources:
          #TODO: Replace the following with CSVW Source description
          #source = URIRef(source)
+         print "Source " + source
+         #source = locateTable(tableValue)
          source = Literal(source)
 
          logSource = logicalSourceGeneration(source)
 
-         logging.debug('Generating TriplesMap...')
          RMLgenerator.TriplesMapGeneration(tmNode,logSource)
 
-         print "Generating Subject Maps..."
+         print "Generating Subject Map for table schema " + str(tableValue.tableSchema)
          #generate Blank node for Subject Map
          subjMapBN = BNode().skolemize()
          #Generate Subject Map
          RMLgenerator.BlankNodeSubjectMapGeneration(tmNode,subjMapBN)
 
-         print "Generating Predicate Object Maps..."
+         print "Generating Predicate Object Maps for table schema " + str(tableValue.tableSchema)
          columns = g.value(subject = tableValue.tableSchema, predicate = URIRef(CSVW.column))
+
+         #If table schema is in separate file
+         if columns == None:
+            table = g.value(predicate = URIRef(CSVW.url), object = Literal(source))
+            tableSchema = g.value(subject = table, predicate = URIRef(CSVW.tableSchema))
+
+            #g =rdflib.Graph()
+            g.parse(tableSchema, format='json-ld')
+
+            columns = g.triples((None, URIRef(CSVW.column),None),)
+            for s,p,o in columns:
+               columns = o
+
          nextFirst = columns
             
          while nextFirst:
@@ -120,24 +123,22 @@ def CSVWtoRML(inputfile):
             preObj = None
             node = g.value(subject = nextFirst, predicate = RDF.first)
 
-            print "Retrieving column..."
             column = retrieveColumn(source,node)
                      
             if column:
                preObj = BNode().skolemize()
                RMLgenerator.PredicateObjectMapGeneration(tmNode,preObj)
 
-               print "Generating Predicate Map..."
+               #print "Generating Predicate Map..."
                RMLgenerator.PredicateMapGeneration(column,preObj)
 
-               print "Generating Object Map..."
+               #print "Generating Object Map..."
                #Extract the title that points to the corresponding column to generate the Object Map
                objectValues = g.objects(node,URIRef(CSVW.title))
                for objectValue in objectValues:
-                  
                   objMap = RMLgenerator.ObjectMapGeneration(Literal(objectValue),preObj,'reference-valued')
                   if (node, CSVW.datatype, None ) in g:
-                     print "Checking for datatype..."
+                     #print "Checking for datatype..."
                      datatypeGeneration(node, objMap)
                      
                if ((node, URIRef(CSVW.valueUrl), None) not in g):
@@ -151,9 +152,6 @@ def CSVWtoRML(inputfile):
                      if (datatype, CSVW.base, None ) in g:
                         datatype = g.value(node, URIRef(CSVW.base))
                      if objMap and datatype:
-                        #datatype = g.value(node, URIRef(CSVW.datatype))
-                        #if(datatype):
-                        print "Checking for datatype..."
                         RMLgenerator.DatatypeGeneration(datatype,objMap)
                elif (node, URIRef(CSVW.valueUrl), None) in g:
                   objectValues = g.objects(node,URIRef(CSVW.valueUrl))
@@ -162,7 +160,6 @@ def CSVWtoRML(inputfile):
                      objMap = RMLgenerator.ObjectMapGeneration(Literal(objectValue),preObj,'template-valued')
 
             nextFirst = g.value(subject = nextFirst, predicate = RDF.rest)
-            print "next..."
             
 
 
