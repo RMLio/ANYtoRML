@@ -46,12 +46,13 @@ def logicalSourceGeneration(source):
 
 def retrieveColumn(source,node):
    column = None
-   column = g.value(subject = node, predicate = CSVW.propertyUrl)
+   #column = g.value(subject = node, predicate = CSVW.propertyUrl)
 
    if not column:
       column = g.value(subject = node, predicate = CSVW.name)
       if column:
-         column = source + "#" + column
+         #column = source + "#" + column
+         column = "http://example.org/countries.csv#" + column
 
    return column
 
@@ -139,17 +140,21 @@ def CSVWtoRML(inputfile):
                      print "Checking for datatype..."
                      datatypeGeneration(node, objMap)
                      
-               if ((node, URIRef(CSVW.title), None) not in g) and ((node, URIRef(CSVW.valueUrl), None) not in g):
+               if ((node, URIRef(CSVW.valueUrl), None) not in g):
+               #if ((node, URIRef(CSVW.title), None) not in g) and ((node, URIRef(CSVW.valueUrl), None) not in g):
                   objectValues = g.objects(node,URIRef(CSVW.name))
                   for objectValue in objectValues:
                      objectValueBN = BNode().skolemize()
 
                      objMap = RMLgenerator.ObjectMapGeneration(Literal(objectValue),preObj,'reference-valued')
-                     if objMap and (node, CSVW.datatype, None ) in g:
-                        datatype = g.value(node, URIRef(CSVW.datatype))
-                        if(datatype):
-                           print "Checking for datatype"
-                           RMLgenerator.DatatypeGeneration(datatype,objMap)
+                     datatype = g.value(node, URIRef(CSVW.datatype))
+                     if (datatype, CSVW.base, None ) in g:
+                        datatype = g.value(node, URIRef(CSVW.base))
+                     if objMap and datatype:
+                        #datatype = g.value(node, URIRef(CSVW.datatype))
+                        #if(datatype):
+                        print "Checking for datatype..."
+                        RMLgenerator.DatatypeGeneration(datatype,objMap)
                elif (node, URIRef(CSVW.valueUrl), None) in g:
                   objectValues = g.objects(node,URIRef(CSVW.valueUrl))
                   for objectValue in objectValues:
